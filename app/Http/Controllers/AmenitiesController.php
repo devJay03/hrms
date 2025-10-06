@@ -1,19 +1,28 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Amenity\StoreAmenity;
+use App\Http\Requests\Amenity\UpdateAmenity;
 use App\Models\Amenity;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AmenitiesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $amenities = Amenity::all();
-        return inertia('amenities', [
-            'amenities' => $amenities,
+        $amenities = Amenity::query()
+            ->withCount('rooms')
+            ->when($request->search, fn($q) => $q->search($request->search))
+            ->paginate($request->get('per_page', 10));
+
+        return Inertia::render('web/amenities', [
+            'amenities'  => $amenities->items(),
+            'pagination' => $amenities->toArray(),
+            'filters'    => $request->only(['search', 'per_page', 'sort_by', 'sort_order']),
         ]);
     }
 
@@ -28,14 +37,11 @@ class AmenitiesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreAmenity $request)
     {
-        $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-        ]);
+        $data = $request->validated();
 
-        Amenity::create($validated);
+        Amenity::create($data);
 
         return redirect()
             ->route('amenities.index')
@@ -62,16 +68,27 @@ class AmenitiesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateAmenity $request, Amenity $amenity)
     {
-        //
+        $data = $request->validated();
+
+        $amenity->update($data);
+
+        return redirect()
+            ->route('amenities.index')
+            ->with('status', 'success')
+            ->with('message', 'Amenity was updated successfully!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Amenity $amenity)
     {
-        //
+        $amenity->delete();
+        return redirect()
+            ->route('amenities.index')
+            ->with('message', $amenity->name . ' was deleted successfully!')
+            ->with('status', 'success');
     }
 }

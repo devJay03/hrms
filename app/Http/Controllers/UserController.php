@@ -1,17 +1,30 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Requests\User\StoreUser;
+use App\Http\Requests\User\UpdateUser;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return User::all();
+        $users = User::query()
+            ->when($request->search, fn($q) => $q->search($request->search))
+            ->when($request->role, fn($q) => $q->where('role', $request->role))
+            ->paginate($request->get('per_page', 10));
+
+        return Inertia::render('web/users', [
+            'users'      => $users->items(),
+            'pagination' => $users->toArray(),
+            'filters'    => $request->only(['search', 'role', 'department', 'per_page', 'sort_by', 'sort_order']),
+        ]);
     }
 
     /**
@@ -25,16 +38,14 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUser $request)
     {
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'role'     => 'required',
-            'password' => 'required',
-        ]);
-
-        return User::create($validated);
+        $data = $request->validated();
+        $user = User::create($data);
+        return redirect()
+            ->route('users.index')
+            ->with('message', $user->name . ' with the role ' . $user->role . ' was created successfully!')
+            ->with('status', 'success');
     }
 
     /**
@@ -56,16 +67,17 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUser $request, User $user)
     {
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'sometimes',
-        ]);
-
-        $user->update($validated);
-        return $user;
+        $data = $request->validated();
+        if (empty($data['password'])) {
+            unset($data['password']);
+        }
+        $user->update($data);
+        return redirect()
+            ->route('users.index')
+            ->with('message', $user->name . ' was updated successfully!')
+            ->with('status', 'success');
     }
 
     /**
@@ -73,7 +85,17 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        if ($user->id == Auth::id()) {
+            return redirect()
+                ->back()
+                ->with('message', 'Unable to delete the currently logged in user')
+                ->with('status', 'warning');
+        }
+
         $user->delete();
-        return response()->noContent();
+        return redirect()
+            ->route('users.index')
+            ->with('message', $user->name . ' was deleted successfully!')
+            ->with('status', 'success');
     }
 }

@@ -1,4 +1,4 @@
-import ConfirmDeleteModal from '@/components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '@/components/modals/delete-modal';
 import UserManagement from '@/components/modals/UserManagement';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';

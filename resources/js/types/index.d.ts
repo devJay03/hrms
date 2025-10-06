@@ -36,11 +36,16 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    number: string;
     avatar?: string;
     email_verified_at: string | null;
+    department_id: string;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    role: string;
+    password: string;
+    users: Users[];
+    [key: string]: unknown;
 }
 
 export interface Flash {
@@ -58,6 +63,7 @@ export interface PageProps extends InertiaPageProps {
 export interface Amenity {
     id: number;
     name: string;
+    is_available: number;
     description?: string | null;
     created_at?: string;
     updated_at?: string;

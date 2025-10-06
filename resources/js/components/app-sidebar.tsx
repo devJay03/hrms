@@ -1,17 +1,9 @@
 import { NavFooter } from '@/components/nav-footer';
+import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardList, Folder, LayoutGrid, Users, type LucideIcon } from 'lucide-react';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Link } from '@inertiajs/react';
+import { ClipboardList, LayoutGrid, Users, type LucideIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 interface LocalNavItem {
@@ -28,7 +20,7 @@ const mainNavItems: LocalNavItem[] = [
     },
     {
         title: 'Users',
-        href: '/user-page',
+        href: '/users',
         icon: Users,
     },
 
@@ -39,29 +31,16 @@ const mainNavItems: LocalNavItem[] = [
     },
 ];
 
-const footerNavItems: LocalNavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
+const footerNavItems: LocalNavItem[] = [];
 
 export function AppSidebar() {
-    const { url } = usePage();
-
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href={'/dashboard'} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -70,28 +49,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarGroup>
-                    <SidebarMenu>
-                        {mainNavItems.map((item) => {
-                            const isActive = url === item.href || url.startsWith(item.href);
-                            const Icon = item.icon;
-
-                            return (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        className={isActive ? 'bg-red-100 text-red-600 hover:bg-red-100 hover:text-red-600' : ''}
-                                    >
-                                        <Link href={item.href}>
-                                            <Icon className={isActive ? 'text-red-600' : ''} />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            );
-                        })}
-                    </SidebarMenu>
-                </SidebarGroup>
+                <NavMain items={mainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

@@ -17,7 +17,7 @@ export default function UserModal({ isOpen, onClose, user }: Props) {
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: '',
         email: '',
-        department_id: '',
+        number: '',
         role: '',
         password: '',
         password_confirmation: '',
@@ -27,7 +27,7 @@ export default function UserModal({ isOpen, onClose, user }: Props) {
         setData({
             name: user?.name || '',
             email: user?.email || '',
-            department_id: user?.department_id || '',
+            number: user?.number || '',
             role: user?.role || '',
             password: '',
             password_confirmation: '',
@@ -80,6 +80,12 @@ export default function UserModal({ isOpen, onClose, user }: Props) {
                             />
                             {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                         </div>
+
+                        <div className="flex-1">
+                            <Label className="block text-sm font-medium text-gray-700">Phone Number</Label>
+                            <Input type="number" value={data.number} onChange={(e) => setData('number', e.target.value)} placeholder="Phone Number" />
+                            {errors.number && <p className="text-sm text-red-500">{errors.number}</p>}
+                        </div>
                     </div>
 
                     <div>
@@ -90,7 +96,10 @@ export default function UserModal({ isOpen, onClose, user }: Props) {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="admin">Admin</SelectItem>
-                                <SelectItem value="user">User</SelectItem>
+                                <SelectItem value="manager">Manager</SelectItem>
+                                <SelectItem value="receptionist">Receptionist</SelectItem>
+                                <SelectItem value="maintenance">Maintenance</SelectItem>
+                                <SelectItem value="guest">Guest</SelectItem>
                             </SelectContent>
                         </Select>
                         {errors.role && <p className="text-sm text-red-500">{errors.role}</p>}

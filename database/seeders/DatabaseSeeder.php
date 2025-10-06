@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name'     => 'HM Admin',
             'email'    => 'admin@gmail.com',
-            'password' => 'admin123',
-            'role'     => 0,
+            'number'   => '09392928191',
+            'password' => 'admin',
+            'role'     => 'admin',
         ]);
 
         Amenity::create([

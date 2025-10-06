@@ -2,14 +2,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Searchable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,6 +22,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'number',
         'password',
         'role',
     ];
@@ -38,6 +42,11 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+
+    protected function getSearchableConfig()
+    {
+        return ['fields' => ['name', 'email', 'number']];
+    }
     protected function casts(): array
     {
         return [
